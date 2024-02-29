@@ -10,8 +10,9 @@ Developed for COMP 3663 by:
 
 # 📡 Tech Stack
 - Python
-- Tkinter
-- SQLite
+- Django
+- Bootstrap
+- SQL
 
 # ⚙️ Setup & Run
 
