@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Questventory_App.apps.QuestventoryAppConfig'
 ]
 
 MIDDLEWARE = [
@@ -75,8 +76,12 @@ WSGI_APPLICATION = 'questventory.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'questventory',
+        'USER': 'questuser',
+        'PASSWORD': '?8_hWPVq9Sm1zwl(1n)$9Fb-',
+        'HOST':'154.12.229.140',
+        'PORT':'3306',
     }
 }
 
