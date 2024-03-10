@@ -18,15 +18,13 @@ def add_game_with_stock(request):
                 release_date=form.cleaned_data['release_date'],
                 developer=form.cleaned_data['developer'],
             )
-            # Assuming create_genre and manage_game_stock are implemented correctly in the factory
-            game.genres.set(form.cleaned_data['genres'])
             
-            # Handle console and stock using the factory
+            game.genres.set(form.cleaned_data['genres'])
             console = form.cleaned_data['console']
             stock = form.cleaned_data['stock']
             factory.manage_game_stock(game_id=game.id, console_id=console.id, stock=stock)
             
-            return redirect('success_url')  # Redirect to a new URL
+            return redirect('add_game.html')
     else:
         form = ComprehensiveGameForm()
     return render(request, 'add_game.html', {'form': form})
