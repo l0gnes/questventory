@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container h-75">
+    <h2 class="mb-4">My Inventory</h2>
+    <div class="row align-items-start h-100">
+        <div class="col-9 h-100">
+
+            <div class="mb-3">
+                <input class="form-control" placeholder="Type to search..."/>
+            </div>
+
+            <div class="h-100 inline-block"> <!-- Scrollbox -->
+                
+                <ul class="list-group">
+                    <li class="list-group-item">Placeholder</li>
+                    <li class="list-group-item">Placeholder</li>
+                    <li class="list-group-item">Placeholder</li>
+                    <li class="list-group-item">Placeholder</li>
+                    <li class="list-group-item">Placeholder</li>
+                </ul>
+
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Search by
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Game Title</a></li>
+                    <li><a class="dropdown-item" href="#">Console</a></li>
+                    <li><a class="dropdown-item" href="#">Developer</a></li>
+                    <li><a class="dropdown-item" href="#">Publisher</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
