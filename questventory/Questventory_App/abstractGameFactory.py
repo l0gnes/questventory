@@ -1,55 +1,32 @@
 from abc import ABC, abstractmethod
+from django.db import transaction
 from .models import Game, Console, Developer, Genre, GameConsoleStock
 
-# Defining abstract methods
+# The abstract factory instantiation for creating new game entries.
 class AbstractGameInventoryFactory(ABC):
     @abstractmethod
-    def create_game(self, **kwargs):
+    def create_game(self, title, release_date, developer_name, genre_ids, console_ids, stock):
         pass
 
-    @abstractmethod
-    def create_console(self, **kwargs):
-        pass
-
-    @abstractmethod
-    def create_developer(self, **kwargs):
-        pass
-
-    @abstractmethod
-    def create_genre(self, **kwargs):
-        pass
-
-    @abstractmethod
-    def manage_game_stock(self, game_id, console_id, stock):
-        pass
     
-# Concrete Implementation of the Abstract Game Factory Design pattern
-# to add games to the Database.
-
 class GameInventoryFactory(AbstractGameInventoryFactory):
-    def create_game(self, **kwargs):
-        return Game.objects.create(**kwargs)
+    # Atomic transaction makes sure that all the fields are valid before creating anything.
+    # Nothing will be done if a field is not valid.
+    @transaction.atomic
+    def create_game(self, title, release_date, developer_name, genre_ids, console_ids, stock):
+        # Create or get the Developer
+        developer, _ = Developer.objects.get_or_create(name=developer_name)
 
-    def create_console(self, **kwargs):
-        return Console.objects.create(**kwargs)
+        # Create the Game
+        game = Game.objects.create(title=title, release_date=release_date, developer=developer)
 
-    def create_developer(self, **kwargs):
-        return Developer.objects.create(**kwargs)
+        # Associate Genres
+        genres = Genre.objects.filter(id__in=genre_ids)
+        game.genres.set(genres)
 
-    def create_genre(self, **kwargs):
-        return Genre.objects.create(**kwargs)
+        # Associate Consoles and Stock
+        for console_id in console_ids:
+            console = Console.objects.get(id=console_id)
+            GameConsoleStock.objects.create(game=game, console=console, stock=stock)
 
-    def manage_game_stock(self, game_id, console_id, stock):
-        game_instance = Game.objects.get(id=game_id)
-        console_instance = Console.objects.get(id=console_id)
-        stock_entry, created = GameConsoleStock.objects.get_or_create(
-            game=game_instance, 
-            console=console_instance, 
-            defaults={'stock': stock}
-        )
-        if not created:
-            # Checks if the game already exists and has stock. If it does, it'll add
-            # to the existing stock.
-            stock_entry.stock = stock
-            stock_entry.save()
-        return stock_entry
+        return game

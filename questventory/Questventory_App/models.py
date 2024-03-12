@@ -1,55 +1,51 @@
 from django.db import models
 
-# Database model for consoles
 class Console(models.Model):
-    name = models.CharField(max_length=100)
-    manufacturer = models.CharField(max_length=100)
+    CONSOLE_CHOICES = [
+        ('nintendo_switch', 'Nintendo Switch'),
+        ('sony_playstation_5', 'Sony Playstation 5'),
+        ('microsoft_xbox_series_x', 'Microsoft Xbox Series X'),
+    ]
+    name = models.CharField(max_length=100, choices=CONSOLE_CHOICES, unique=True)
 
     def __str__(self):
-        return self.name
+        return self.get_name_display()
 
 class Developer(models.Model):
-    developerName = models.CharField(max_length=100)
-    nationality = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
 
-# Database model for Genre table
 class Genre(models.Model):
-    
     GENRE_CHOICES = [
         ('action', 'Action'),
         ('adventure', 'Adventure'),
-        ('horror', 'Horror')
-        ('rpg', 'RPG')
+        ('horror', 'Horror'),
+        ('rpg', 'RPG'),
     ]
-    
-    genreName = models.CharField(max_length=50, choices=GENRE_CHOICES)
+    name = models.CharField(max_length=50, choices=GENRE_CHOICES, unique=True)
 
     def __str__(self):
-        return self.name
+        return self.get_name_display()
 
-# Database model for games, using developers as a foreign key.
 class Game(models.Model):
     title = models.CharField(max_length=200)
     release_date = models.DateField()
     developer = models.ForeignKey(Developer, on_delete=models.CASCADE)
-    consoles = models.ManyToManyField(Console, through = 'GameConsoleStock')
+    consoles = models.ManyToManyField(Console, through='GameConsoleStock')
     genres = models.ManyToManyField(Genre)
 
     def __str__(self):
         return self.title
 
-# Database model to track stock of games per console instead of all combined.    
 class GameConsoleStock(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     console = models.ForeignKey(Console, on_delete=models.CASCADE)
-    # Stock amount, starts at zero.
-    stock = models.IntegerField(default=0)
+    stock = models.IntegerField(default=0)  # Stock amount, starts at zero.
 
     class Meta:
         unique_together = ('game', 'console')  # Ensures each game-console pair is unique
 
     def __str__(self):
-        return f"{self.game.title} on {self.console.name} - Stock: {self.stock}"
+        return f"{self.game.title} on {self.console.get_name_display()} - Stock: {self.stock}"

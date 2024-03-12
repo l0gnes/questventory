@@ -55,7 +55,9 @@ ROOT_URLCONF = 'questventory.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            "./Questventory_App/templates"
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
