@@ -4,6 +4,7 @@ from django.views.generic.base import TemplateView
 from .forms import ComprehensiveGameForm
 from .models import Game, Genre, Developer, Console, GameConsoleStock
 from .abstractGameFactory import GameInventoryFactory
+from django.db.models import Sum
 
 def home(request):
     # Displays the last 10 added games to the panel on the home page.
@@ -34,9 +35,18 @@ def home(request):
     else:
         form = ComprehensiveGameForm()
         
-    recent_games = Game.objects.all().order_by('-id')[:10]
+    recent_games = Game.objects.annotate(total_stock=Sum('gameconsolestock__stock')).order_by('-id')[:10]
     return render(request, 'home.html', {'form': form, 'recent_games': recent_games})
 
 def allInventory(request):
     wholeInventory = Game.objects.all().order_by('-id')[0::]
     return render(request, 'inventory.html', {'wholeInventory': wholeInventory})
+
+def gameDetail(request, pk):
+    game = get_object_or_404(Game, pk=pk)
+    return render(request, 'gamedetail.html', {'game': game})
+
+def deleteInventoryEntry(request, pk):
+    game = get_object_or_404(Game, pk=pk)
+    game.delete()
+    return redirect('inventory')

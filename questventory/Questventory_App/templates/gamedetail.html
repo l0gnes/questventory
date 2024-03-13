@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ game.title }}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Panel for recently added games -->
+            <div class="col-md-2">
+                <p> This is where a placeholder image would be. </p>
+            </div>
+            <div class="col-md-2">
+                <h1>{{ game.title }}</h1>
+                <p><strong>Release Date:</strong> {{ game.release_date }}</p>
+                <p><strong>Developer:</strong> {{ game.developer.name }}</p>
+                <p><strong>Genres:</strong> {% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                <p><strong>Available Consoles:</strong> {% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                <p><strong>Stock Available:</strong> {{ game.total_stock }}</p>
+            </div>
+        </div>
+        <div class="d-flex">
+            <button class="btn btn-primary">Edit Entry</button>
+            <button class="btn btn-primary"><a href="{% url 'deleteInventoryEntry' game.pk %}" onclick="return confirm('Are you sure?');"></a>Delete</button>
+        </div>
+        {% endblock %}
+    </body>
+    </html>

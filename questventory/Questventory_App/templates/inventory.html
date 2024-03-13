@@ -41,7 +41,7 @@
                             {% for game in wholeInventory %}
                                 <tr>
                                     <th scope="row">{{ forloop.counter }}</th>
-                                    <td>{{ game.title }}</td>
+                                    <td><a href="{% url 'gameDetail' game.pk %}">{{ game.title }}</td>
                                     <td>{% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                     <td>{% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                     <td>{{ game.developer.name }}</td>

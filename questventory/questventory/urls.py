@@ -16,18 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-<<<<<<< HEAD
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('Questventory_App.urls'))
-]
-=======
 from Questventory_App import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home.html', views.home, name='home'),
-    path('inventory.html', views.allInventory, name='inventory')
+    path('inventory.html', views.allInventory, name='inventory'),
+    path('inventory.html', views.allInventory, name='inventory'),
+    path('gamedetail/<int:pk>', views.gameDetail, name='gameDetail' ),
+    path('gamedetail/delete/<int:pk>/', views.deleteInventoryEntry, name='deleteInventoryEntry'),
 ]
->>>>>>> 635f3a40d18b0fb76fcad4537f0c9419abbcbeb1
+
