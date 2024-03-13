@@ -37,15 +37,7 @@
                                   <td>{% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                   <td>{% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                   <td>{{ game.developer.name }}</td>
-                                  <td>
-                                      {% with total_stock=0 %}
-                                          {% for stock in game.gameconsolestock_set.all %}
-                                              {% with total_stock=total_stock|add:stock.stock %}
-                                              {% endwith %}
-                                          {% endfor %}
-                                      {{ total_stock }}
-                                      {% endwith %}
-                                  </td>
+                                  <td>{{ game.total_stock }}</td>
                               </tr>
                           {% empty %}
                               <tr>

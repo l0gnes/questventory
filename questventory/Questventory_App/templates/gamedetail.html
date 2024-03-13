@@ -22,7 +22,7 @@
                 <p><strong>Developer:</strong> {{ game.developer.name }}</p>
                 <p><strong>Genres:</strong> {% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
                 <p><strong>Available Consoles:</strong> {% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-                <p><stong>Stock Available:</strong> {{ game.stock }}</p>
+                <p><strong>Stock Available:</strong> {{ game.total_stock }}</p>
             </div>
         </div>
         <div class="d-flex">
