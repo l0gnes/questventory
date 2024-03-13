@@ -21,5 +21,7 @@ from Questventory_App import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home.html', views.home, name='home'),
-    path('inventory.html', views.allInventory, name='inventory')
+    path('inventory.html', views.allInventory, name='inventory'),
+    path('gamedetail/<int:pk>', views.gameDetail, name='gameDetail' ),
+    path('gamedetail/delete/<int:pk>/', views.deleteInventoryEntry, name='deleteInventoryEntry'),
 ]

@@ -40,3 +40,12 @@ def home(request):
 def allInventory(request):
     wholeInventory = Game.objects.all().order_by('-id')[0::]
     return render(request, 'inventory.html', {'wholeInventory': wholeInventory})
+
+def gameDetail(request, pk):
+    game = get_object_or_404(Game, pk=pk)
+    return render(request, 'gamedetail.html', {'game': game})
+
+def deleteInventoryEntry(request, pk):
+    game = get_object_or_404(Game, pk=pk)
+    game.delete()
+    return redirect('inventory')
