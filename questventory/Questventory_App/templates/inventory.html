@@ -6,22 +6,15 @@
     <div class="row align-items-start h-100">
         <div class="col-9 h-100">
 
-            <div class="mb-3">
-                <input class="form-control" placeholder="Type to search..."/>
-            </div>
-
-            <div class="col-3">
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Search by
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Game Title</a></li>
-                        <li><a class="dropdown-item" href="#">Console</a></li>
-                        <li><a class="dropdown-item" href="#">Developer</a></li>
-                        <li><a class="dropdown-item" href="#">Publisher</a></li>
-                    </ul>
-                </div>
+            <form method="get" action="{% url 'search_inventory' %}">
+                <input type="text" name="search" placeholder="Search games by name">
+                <button type="submit">Search</button>
+            </form>
+            
+            {% for game in game_list %}
+                <div>{{ game.title }}</div>
+                <!-- Display other game details as needed -->
+            {% endfor %}
 
             <div class="h-100 inline-block"> <!-- Scrollbox -->
                 
@@ -45,15 +38,7 @@
                                     <td>{% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                     <td>{% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                     <td>{{ game.developer.name }}</td>
-                                    <td>
-                                        {% with total_stock=0 %}
-                                            {% for stock in game.gameconsolestock_set.all %}
-                                                {% with total_stock=total_stock|add:stock.stock %}
-                                                {% endwith %}
-                                            {% endfor %}
-                                        {{ total_stock }}
-                                        {% endwith %}
-                                    </td>
+                                    <td>{{ game.total_stock }}</td>
                                 </tr>
                             {% empty %}
                                 <tr>

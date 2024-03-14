@@ -2,9 +2,9 @@ from django.db import models
 
 class Console(models.Model):
     CONSOLE_CHOICES = [
-        ('nintendo_switch', 'Nintendo Switch'),
-        ('sony_playstation_5', 'Sony Playstation 5'),
-        ('microsoft_xbox_series_x', 'Microsoft Xbox Series X'),
+        ('nintendo switch', 'Nintendo Switch'),
+        ('sony playstation 5', 'Sony Playstation 5'),
+        ('microsoft xbox series x', 'Microsoft Xbox Series X'),
     ]
     name = models.CharField(max_length=100, choices=CONSOLE_CHOICES, unique=True)
 
@@ -43,6 +43,7 @@ class GameConsoleStock(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     console = models.ForeignKey(Console, on_delete=models.CASCADE)
     stock = models.IntegerField(default=0)  # Stock amount, starts at zero.
+    is_low_stock = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('game', 'console')  # Ensures each game-console pair is unique

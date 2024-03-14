@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="container-fluid">
-        <div class="row">
+        <div class="col">
             <!-- Panel for recently added games -->
             <div class="col-md-2">
                 <div class="d-flex">
@@ -47,8 +47,18 @@
                       </tbody>
                   </table>
               </div>
-              
-            </div>
+              <h2>Low Stock Items</h2>
+                {% for item in low_stock_games %}
+                <div>
+                    <p>{{ item.game.title }} for {{ item.console.name }}: {{ item.stock }} units left</p>
+                    {% comment %} <form action="{% url 'restock_inventory' item.pk %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="Restock">
+                    </form> {% endcomment %}
+                </div>
+                {% empty %}
+                <p>All items are sufficiently stocked.</p>
+                {% endfor %}
         </div>
     </div>
 

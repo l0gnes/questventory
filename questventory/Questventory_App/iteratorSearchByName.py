@@ -47,3 +47,7 @@ class GameList(Iterable):
     
     def __getitem__(self, index : int) -> Game:
         return self.games[index]
+    
+    def search_by_name(self, query: str) -> "GameList":
+        matching_games = [game for game in self.games if query.lower() in game.title.lower()]
+        return GameList(matching_games)

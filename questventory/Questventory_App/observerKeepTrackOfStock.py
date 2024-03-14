@@ -54,18 +54,15 @@ class SubscriberInterface(ABC):
 class RestockSubscriber(SubscriberInterface):
     """
         If the stock reaches the set threshold, this subscriber 
-        will order more items and restock the inventory.
+        will flag them in the GameConsoleStock model to be displayed.
     """
 
-    threshold : int # When to order more stock
-    restock_order_amount : int
-
-    def __init__(self, *, threshold : int = 0, restock_order_amount : int = 50) -> None:
+    def __init__(self, *, threshold: int = 10) -> None:
         self.threshold = threshold
-        self.restock_order_amount = restock_order_amount
 
-    def update(self, stock : GameConsoleStock) -> None:
-
+    def update(self, stock: GameConsoleStock) -> None:
         if stock.stock <= self.threshold:
-            stock.stock += self.restock_order_amount
-            stock.save()
+            stock.is_low_stock = True
+        else:
+         stock.is_low_stock = False
+        stock.save()

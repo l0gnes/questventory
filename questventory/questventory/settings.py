@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Questventory_App.apps.QuestventoryAppConfig'
+    'Questventory_App.apps.QuestventoryAppConfig',
 ]
 
 MIDDLEWARE = [
