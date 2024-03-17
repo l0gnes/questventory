@@ -1,14 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Inventory Screen</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
     <div class="container-fluid">
         <div class="col">
             <!-- Panel for recently added games -->
@@ -47,17 +38,11 @@
                       </tbody>
                   </table>
               </div>
-              <h2>Low Stock Items</h2>
-                {% for item in low_stock_games %}
-                <div>
-                    <p>{{ item.game.title }} for {{ item.console.name }}: {{ item.stock }} units left</p>
-                    {% comment %} <form action="{% url 'restock_inventory' item.pk %}" method="post">
-                        {% csrf_token %}
-                        <input type="submit" value="Restock">
-                    </form> {% endcomment %}
-                </div>
-                {% empty %}
-                <p>All items are sufficiently stocked.</p>
+                <h2>Low Stock Items</h2>
+                {% for notification in low_stock_notifications %}
+                    <div>
+                    <p>{{ notification.game_title }} on {{ notification.console_name }} is low on stock: {{ notification.stock_amount }} left.</p>
+                    </div>
                 {% endfor %}
         </div>
     </div>
@@ -114,6 +99,4 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
-</body>
-</html>
 

@@ -5,19 +5,7 @@
     <h2 class="mb-4">My Inventory</h2>
     <div class="row align-items-start h-100">
         <div class="col-9 h-100">
-
-            <form method="get" action="{% url 'search_inventory' %}">
-                <input type="text" name="search" placeholder="Search games by name">
-                <button type="submit">Search</button>
-            </form>
-            
-            {% for game in game_list %}
-                <div>{{ game.title }}</div>
-                <!-- Display other game details as needed -->
-            {% endfor %}
-
             <div class="h-100 inline-block"> <!-- Scrollbox -->
-                
                 <div class="list-group" style="height: 500px; width: 1000px; overflow-y: scroll;">
                     <table class="table">
                         <thead class="thead-dark">
@@ -48,7 +36,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
               </div>
           </div>
       </div>

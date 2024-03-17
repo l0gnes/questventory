@@ -16,15 +16,19 @@ from .models import GameConsoleStock
 
 # this doesn't deal with individual games, but rather a process using game stocks
 # which lets us focus on those objects, and operate based on both a stock integer 
-# and game data, which is probably more "useful" 
+# and game data, which is probably more "useful"
 
-class StockObserver(object):
+class LowStockNotification:
+    def __init__(self, game_title, console_name, stock_amount):
+        self.game_title = game_title
+        self.console_name = console_name
+        self.stock_amount = stock_amount
 
-    changed_stock_state : GameConsoleStock
-    subscribers : List["SubscriberInterface"]
+class StockObserver:
 
     def __init__(self) -> None:
-        self.subscribers = []
+        self.subscribers: List["SubscriberInterface"] = []
+        self.low_stock_notifications: List[LowStockNotification] = []
 
     def subscribe(self, s : "SubscriberInterface") -> None:
         self.subscribers.append(s)
@@ -32,16 +36,26 @@ class StockObserver(object):
     def unsubscribe(self, s : "SubscriberInterface") -> None:
         self.subscribers.remove(s)
 
-    def notify_subscribers(self) -> None:
-        """Actually iterate over each of the subscribers and send them the new updated stock"""
+    def notify_subscribers(self, stock: GameConsoleStock) -> None:
+        """Actually iterate over each of the subscribers and notify them of low stock items"""
         for s in self.subscribers:
-            s.update(self.changed_stock_state)
+            s.update(stock)
 
     # NOTE: This should be called whenever the GameConsoleStock is reduced by natural causes (e.g., a game sale)
-    def item_sell_callback(self, s : GameConsoleStock):
+    def item_sell_callback(self, stock:  GameConsoleStock) -> None:
         """The callback to notify subscribers of a stock being reduced"""
-        self.changed_stock_state = s    # Set the state to focus on the changed stock
-        self.notify_subscribers()   # Notify subscribers
+        self.notify_subscribers(stock)
+    
+    # Adding a low stock notification where necessary.    
+    def add_low_stock_notification(self, notification: LowStockNotification) -> None:
+        self.low_stock_notifications.append(notification)
+
+    # Getting low stock notifications to display where needed.
+    def get_low_stock_notifications(self) -> List[LowStockNotification]:
+        return self.low_stock_notifications
+    
+# Initialization of the global stock observer for use elsewhere.
+global_stock_observer = StockObserver()
 
 
 class SubscriberInterface(ABC):
@@ -51,18 +65,19 @@ class SubscriberInterface(ABC):
         raise NotImplemented
 
 
-class RestockSubscriber(SubscriberInterface):
-    """
-        If the stock reaches the set threshold, this subscriber 
-        will flag them in the GameConsoleStock model to be displayed.
-    """
-
-    def __init__(self, *, threshold: int = 10) -> None:
+# This is the subscriber that receives notifications for low stock items. Currently
+# the low stock threshold is 10, but it could be changed to anything.
+class LowStockSubscriber(SubscriberInterface):
+    def __init__(self, observer: StockObserver, threshold: int = 10) -> None:
+        self.observer = observer
         self.threshold = threshold
-
+    
     def update(self, stock: GameConsoleStock) -> None:
         if stock.stock <= self.threshold:
-            stock.is_low_stock = True
-        else:
-         stock.is_low_stock = False
-        stock.save()
+            notification = LowStockNotification(
+                game_title=stock.game.title,
+                console_name=stock.console.name,
+                stock_amount=stock.stock
+            )
+            self.observer.add_low_stock_notification(notification)
+            print("Notification added.")

@@ -47,6 +47,15 @@ class GameConsoleStock(models.Model):
 
     class Meta:
         unique_together = ('game', 'console')  # Ensures each game-console pair is unique
+    
+    # This overwrites the default saving method. It enforces whenever this model is saved
+    # to trigger the is_low_stock boolean.    
+    def save(self, *args, **kwargs):
+        if self.stock < 10:
+            self.is_low_stock = True
+        else:
+            self.is_low_stock = False
+        super().save(*args, **kwargs)    
 
     def __str__(self):
         return f"{self.game.title} on {self.console.get_name_display()} - Stock: {self.stock}"
