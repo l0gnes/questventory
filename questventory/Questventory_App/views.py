@@ -62,7 +62,9 @@ def home(request):
     return render(request, 'home.html', {'form': form, 'recent_games': recent_games, 'low_stock_notifications': notifications})
 
 def allInventory(request):
-    wholeInventory = Game.objects.all().order_by('-id')[0::]
+    wholeInventory = Game.objects.annotate(
+        total_stock=Sum("gameconsolestock__stock")
+    ).order_by("-id")[0::]
     return render(request, 'inventory.html', {'wholeInventory': wholeInventory, 'search_form' : InventorySearchForm()})
 
 def gameDetail(request, pk):
