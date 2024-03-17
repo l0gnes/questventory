@@ -1,50 +1,49 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container h-75">
+<div class="container">
     <h2 class="mb-4">My Inventory</h2>
-    <div class="row align-items-start h-100">
-        <div class="col-9 h-100">
-            <div class="h-100 inline-block"> <!-- Scrollbox -->
-                <div class="list-group" style="height: 500px; width: 1000px; overflow-y: scroll;">
-                    <table class="table">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Console(s)</th>
-                                <th scope="col">Genre(s)</th>
-                                <th scope="col">Developer</th>
-                                <th scope="col">Total Stock</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for game in wholeInventory %}
-                                <tr>
-                                    <th scope="row">{{ forloop.counter }}</th>
-                                    <td><a href="{% url 'gameDetail' game.pk %}">{{ game.title }}</td>
-                                    <td>{% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-                                    <td>{% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-                                    <td>{{ game.developer.name }}</td>
-                                    <td>{{ game.total_stock }}</td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="6">No recent game additions found.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
 
-              </div>
-          </div>
-      </div>
+    <div>
+        <form action="{% url 'inventory' %}" method="GET" class="d-flex flex-row gap-2">
+            {% csrf_token %}
+            {{ search_form.search_term }}
+            {{ search_form.search_type }}
+            <input type="submit" value="Search">
+        </form>
+    </div>
 
-            </div>
-        </div>
-        
-        </div>
+    <div class="flex flex-grow-1">
+        <div class="list-group">
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Console(s)</th>
+                        <th scope="col">Genre(s)</th>
+                        <th scope="col">Developer</th>
+                        <th scope="col">Total Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in wholeInventory %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td><a href="{% url 'gameDetail' game.pk %}">{{ game.title }}</td>
+                            <td>{% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                            <td>{% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                            <td>{{ game.developer.name }}</td>
+                            <td>{{ game.total_stock }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6">No recent game additions found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>        
     </div>
 </div>
 {% endblock %}

@@ -67,14 +67,14 @@ class SearchViaDeveloper(SearchStrategyInterface):
         
 def get_strategy(
     ctx : QuerySet,
-    type : Literal['name', 'genre', 'console', 'developer']
+    type : Literal['title', 'genre', 'console', 'developer']
 ) -> SearchStrategyInterface:
     """
         A utility function to return the proper type of strategy based on a string literal.
         This hopefully prevents you from having to import a whole lot of extra classes into core
         code.
     """
-    if type == 'name':
+    if type == 'title':
         return SearchViaName(ctx)
     elif type == 'console':
         return SearchViaConsole(ctx)

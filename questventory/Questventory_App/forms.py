@@ -1,5 +1,9 @@
 from django import forms
 from .models import Game, Developer, Console, Genre, GameConsoleStock
+from .searchStrategy import (
+    SearchStrategyInterface,
+    get_strategy
+)
 
 class ComprehensiveGameForm(forms.ModelForm):
     # Additional field for stock on a specific console
@@ -38,3 +42,29 @@ class ComprehensiveGameForm(forms.ModelForm):
                 )
 
         return game
+
+class InventorySearchForm(forms.Form):
+    # Used on the inventory when searching
+
+    search_term = forms.CharField(
+        max_length=200, 
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Search", 
+                "class" : 'flex-grow-1 px-2'
+            }
+        )
+    )
+    search_type = forms.CharField(
+        label="Search by:",
+        widget=forms.Select(choices={
+            "title" : "Title",
+            "console" : "Console",
+            "genre" : "Genre",
+            "developer" : "Developer",
+        }
+    ))
+
+    @staticmethod
+    def get_strategy(strat_str : str) -> SearchStrategyInterface:
+        return get_strategy(Game.objects, type = strat_str)

@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from .forms import ComprehensiveGameForm
+from .forms import ComprehensiveGameForm, InventorySearchForm
 from .models import Game, GameConsoleStock
 from .abstractGameFactory import GameInventoryFactory
 from .observerKeepTrackOfStock import global_stock_observer
@@ -63,7 +63,7 @@ def home(request):
 
 def allInventory(request):
     wholeInventory = Game.objects.all().order_by('-id')[0::]
-    return render(request, 'inventory.html', {'wholeInventory': wholeInventory})
+    return render(request, 'inventory.html', {'wholeInventory': wholeInventory, 'search_form' : InventorySearchForm()})
 
 def gameDetail(request, pk):
     game = get_object_or_404(Game, pk=pk)
