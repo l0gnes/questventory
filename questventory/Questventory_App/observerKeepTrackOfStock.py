@@ -19,7 +19,9 @@ from .models import GameConsoleStock
 # and game data, which is probably more "useful"
 
 class LowStockNotification:
-    def __init__(self, game_title, console_name, stock_amount):
+    def __init__(self, game_id, console_id, game_title, console_name, stock_amount):
+        self.game_id = game_id
+        self.console_id = console_id
         self.game_title = game_title
         self.console_name = console_name
         self.stock_amount = stock_amount
@@ -48,6 +50,12 @@ class StockObserver:
     
     # Adding a low stock notification where necessary.    
     def add_low_stock_notification(self, notification: LowStockNotification) -> None:
+        # For/If statements here check to see if a notification for a particular game/console
+        # already exists. If it doesn't, it gets added. If it does, nothing happens.
+        for existing_notification in self.low_stock_notifications:
+            if (existing_notification.game_id == notification.game_id and
+                existing_notification.console_id == notification.console_id):
+                return
         self.low_stock_notifications.append(notification)
 
     # Getting low stock notifications to display where needed.
@@ -75,6 +83,8 @@ class LowStockSubscriber(SubscriberInterface):
     def update(self, stock: GameConsoleStock) -> None:
         if stock.stock <= self.threshold:
             notification = LowStockNotification(
+                game_id=stock.game.id,
+                console_id=stock.console.id,
                 game_title=stock.game.title,
                 console_name=stock.console.name,
                 stock_amount=stock.stock

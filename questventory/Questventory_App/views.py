@@ -50,10 +50,6 @@ def home(request):
             return redirect('home.html')
     else:
         form = ComprehensiveGameForm()
-    
-  
-  
-  
   
   
     notifications = global_stock_observer.get_low_stock_notifications()
@@ -62,12 +58,13 @@ def home(request):
     return render(request, 'home.html', {'form': form, 'recent_games': recent_games, 'low_stock_notifications': notifications})
 
 def allInventory(request):
-    wholeInventory = Game.objects.all().order_by('-id')[0::]
+    wholeInventory = Game.objects.annotate(total_stock=Sum('gameconsolestock__stock')).order_by('-id')[0::]
     return render(request, 'inventory.html', {'wholeInventory': wholeInventory})
 
 def gameDetail(request, pk):
     game = get_object_or_404(Game, pk=pk)
-    return render(request, 'gamedetail.html', {'game': game})
+    total_stock = game.gameconsolestock_set.aggregate(Sum('stock'))['stock__sum'] or 0
+    return render(request, 'gamedetail.html', {'game': game, 'total_stock': total_stock})
 
 def deleteInventoryEntry(request, pk):
     game = get_object_or_404(Game, pk=pk)
