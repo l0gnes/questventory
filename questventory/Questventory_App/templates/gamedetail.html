@@ -12,9 +12,22 @@
             <p class="mb-2"><strong>Release Date:</strong> {{ game.release_date|date:"Y-m-d" }}</p>
             <p class="mb-2"><strong>Developer:</strong> {{ game.developer.name }}</p>
             <p class="mb-2"><strong>Genres:</strong> {% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-            <p class="mb-2"><strong>Available Consoles:</strong> {% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-            <p class="mb-4"><strong>Stock Available:</strong> {{ total_stock }}</p>
-            
+            <p class="mb-2"><strong>Available Consoles:</strong>{% comment %}  {% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %} {% endcomment %}</p>
+            <ul>
+                {% for stock in console_stocks %}
+                <li>
+                    {{ stock.console.name }}: {{ stock.stock }} available
+                    <form action="{% url 'addToCart' stock.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="game_id" value="{{ game.id }}">
+                        <input type="hidden" name="console_id" value="{{ stock.console.id }}">
+                        <input type="hidden" name="stock_id" value="{{ stock.id }}">
+                        <button type="submit">Add to Cart</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            <p class="mb-2"><strong>Price: $</stong>{{ game.price }}</p>
             <div class="d-flex">
                 <button class="btn btn-primary me-2">Edit Entry</button>
                 <form action="{% url 'deleteInventoryEntry' game.pk %}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure?');">

@@ -28,6 +28,7 @@ urlpatterns = [
     path('inventory.html', views.allInventory, name='search_inventory'),
     path('gamedetail/<int:pk>', views.gameDetail, name='gameDetail' ),
     path('gamedetail/delete/<int:pk>/', views.deleteInventoryEntry, name='deleteInventoryEntry'),
-    
+    path('add_to_cart/<int:stock_id>/', views.addToCart, name='addToCart'),
+    path('checkout.html', views.displayCart, name='checkout'),
 ]
 

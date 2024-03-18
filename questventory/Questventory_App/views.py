@@ -1,9 +1,12 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from .forms import ComprehensiveGameForm, InventorySearchForm
-from .models import Game, GameConsoleStock
+from .models import Game, Console, GameConsoleStock
 from .abstractGameFactory import GameInventoryFactory
 from .observerKeepTrackOfStock import global_stock_observer
 from django.db.models import Sum
+from django.views.decorators.http import require_POST
+from django.contrib import messages
+from decimal import Decimal
 
 def home(request):
     
@@ -82,10 +85,69 @@ def allInventory(request):
 
 def gameDetail(request, pk):
     game = get_object_or_404(Game, pk=pk)
-    total_stock = game.gameconsolestock_set.aggregate(Sum('stock'))['stock__sum'] or 0
-    return render(request, 'gamedetail.html', {'game': game, 'total_stock': total_stock})
+    console_stocks = game.gameconsolestock_set.all()
+    return render(request, 'gamedetail.html', {'game': game, 'console_stocks': console_stocks})
 
 def deleteInventoryEntry(request, pk):
     game = get_object_or_404(Game, pk=pk)
     game.delete()
     return redirect('inventory')
+
+@require_POST
+def addToCart(request, stock_id):
+    game_id = request.POST.get('game_id')
+    console_id = request.POST.get('console_id')
+    
+    # Using Django sessions to store cart inventory as a cookie that can be accessed
+    # by the builder design pattern to create a receipt during the checkout page.
+    cart = request.session.get('cart', {})
+    
+    # Creates a unique pair for the game-console combination in the cart.
+    cart_pair = f"{game_id}_{console_id}"
+    
+    # Fetch the game to get the price associated with it.
+    game = get_object_or_404(Game, pk=game_id)
+    
+    # Since Django uses JSON for sessions, the price needs to be converted to a string
+    # otherwise you get a "Object of type Decimal is not JSON serializable" error.
+    price_string = str(game.price) 
+    
+    # If the game-console pair is already in the cart, then the amount increments by 1.
+    # If the game-console pair isn't already in the cart, it creates a new pair to add.
+    if cart_pair in cart:
+        cart[cart_pair]['quantity'] += 1
+    else:
+        cart[cart_pair] = {
+            'game_id': game_id, 
+            'console_id': console_id, 
+            'quantity': 1,
+            'price': price_string
+            }
+    
+    # Saves the cart in the session cookie.
+    request.session['cart'] = cart
+    
+    messages.success(request, 'Item successfully added to cart.')
+    
+    return redirect('gameDetail', pk=game_id)
+
+def displayCart(request):
+    cart = request.session.get('cart', {})
+    detailed_cart = []
+    total_cost = Decimal('0.00')
+    
+    for key, item in cart.items():
+        game = Game.objects.get(pk=item['game_id'])
+        console = Console.objects.get(pk=item['console_id'])
+        price = Decimal(item['price'])
+        item_total = item['quantity'] * price
+        total_cost += item_total
+        detailed_cart.append({
+            'game_title': game.title,
+            'console': console.name,
+            'quantity': item['quantity'],
+            'price': game.price,
+            'item_total': item_total,
+        })
+    
+    return render(request, 'checkout.html', {'cart': detailed_cart, 'total_cost': total_cost})

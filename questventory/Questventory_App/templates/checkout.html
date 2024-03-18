@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Cart</h2>
+<ul>
+    {% for item in cart %}
+        <li>
+            {{ item.game_title }} for {{ item.console_name }} - Quantity: {{ item.quantity }} - Price: ${{ item.price }} - Subtotal: ${{ item.item_total }}
+        </li>
+    {% endfor %}
+</ul>
+<strong>Total Cost: ${{ total_cost }}</strong>
+{% endblock %}
