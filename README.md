@@ -32,3 +32,5 @@ cd ./questventory
 ```sh
 python manage.py runserver
 ```
+
+4. Open http://localhost:3000 🎊
