@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Any, Literal
 from .models import (Game,Genre,Console,Developer)
 from django.db.models.query import QuerySet
+from .iteratorSearchByName import GameList
 
 # i dont know what you want me to do here
 # i decided that searching by different game attributes makes 
@@ -19,11 +20,11 @@ class SearchStrategyInterface(ABC):
     # just returns the "working query set" of Game elements we'll be sifting through 
     def get_context(self) -> QuerySet:
         if self.ctx is None:
-            return self.ctx
+            return Game.objects # Defaults to all game object
         return self.ctx
 
     @abstractmethod
-    def search(self,s:Any) -> List[Game]: raise NotImplemented # s is the search item
+    def search(self,s:Any) -> GameList: raise NotImplemented # s is the search item
 
 class SearchViaTitle(SearchStrategyInterface):
 
@@ -32,8 +33,8 @@ class SearchViaTitle(SearchStrategyInterface):
     def __init__(self, ctx : QuerySet = None) -> None:
         self.ctx = ctx
 
-    def search(self,s:str) -> List[Game]:
-        return self.ctx.filter(title__icontains=s).all()
+    def search(self,s:str) -> GameList:
+        return GameList(games=self.ctx.filter(title__icontains=s).all())
     
 class SearchViaGenre(SearchStrategyInterface):
 
@@ -42,8 +43,8 @@ class SearchViaGenre(SearchStrategyInterface):
     def __init__(self, ctx : QuerySet = None) -> None:
         self.ctx = ctx
 
-    def search(self, s: str) -> List[Game]:
-        return self.ctx.filter(genres__name__icontains=s).all()
+    def search(self, s: str) -> GameList:
+        return GameList(games=self.ctx.filter(genres__name__icontains=s).all())
 
 class SearchViaConsole(SearchStrategyInterface):
 
@@ -52,8 +53,8 @@ class SearchViaConsole(SearchStrategyInterface):
     def __init__(self, ctx : QuerySet = None) -> None:
         self.ctx = ctx
 
-    def search(self, s: str) -> List[Game]:
-        return self.ctx.filter(consoles__name__icontains=s).all()
+    def search(self, s: str) -> GameList:
+        return GameList(games=self.ctx.filter(consoles__name__icontains=s).all())
     
 class SearchViaDeveloper(SearchStrategyInterface):
 
@@ -62,8 +63,8 @@ class SearchViaDeveloper(SearchStrategyInterface):
     def __init__(self, ctx : QuerySet = None) -> None:
         self.ctx = ctx
 
-    def search(self, s: str) -> List[Game]:
-        return self.ctx.filter(developer__name__icontains=s).all()
+    def search(self, s: str) -> GameList:
+        return GameList(games=self.ctx.filter(developer__name__icontains=s).all())
         
 def get_strategy(
     ctx : QuerySet,
