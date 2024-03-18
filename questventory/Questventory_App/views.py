@@ -81,7 +81,8 @@ def allInventory(request):
 
 def gameDetail(request, pk):
     game = get_object_or_404(Game, pk=pk)
-    return render(request, 'gamedetail.html', {'game': game})
+    total_stock = game.gameconsolestock_set.aggregate(Sum('stock'))['stock__sum'] or 0
+    return render(request, 'gamedetail.html', {'game': game, 'total_stock': total_stock})
 
 def deleteInventoryEntry(request, pk):
     game = get_object_or_404(Game, pk=pk)

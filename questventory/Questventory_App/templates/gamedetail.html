@@ -13,7 +13,7 @@
             <p class="mb-2"><strong>Developer:</strong> {{ game.developer.name }}</p>
             <p class="mb-2"><strong>Genres:</strong> {% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
             <p class="mb-2"><strong>Available Consoles:</strong> {% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-            <p class="mb-4"><strong>Stock Available:</strong> {{ game.total_stock }}</p>
+            <p class="mb-4"><strong>Stock Available:</strong> {{ total_stock }}</p>
             
             <div class="d-flex">
                 <button class="btn btn-primary me-2">Edit Entry</button>
