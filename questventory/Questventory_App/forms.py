@@ -47,7 +47,8 @@ class InventorySearchForm(forms.Form):
     # Used on the inventory when searching
 
     search_term = forms.CharField(
-        max_length=200, 
+        max_length=200,
+        required=False,
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Search", 
@@ -57,6 +58,7 @@ class InventorySearchForm(forms.Form):
     )
     search_type = forms.CharField(
         label="Search by:",
+        required=True,
         widget=forms.Select(choices={
             "title" : "Title",
             "console" : "Console",
@@ -66,5 +68,5 @@ class InventorySearchForm(forms.Form):
     ))
 
     @staticmethod
-    def get_strategy(strat_str : str) -> SearchStrategyInterface:
-        return get_strategy(Game.objects, type = strat_str)
+    def get_strategy(ctx, strat_str : str) -> SearchStrategyInterface:
+        return get_strategy(ctx=ctx, type = strat_str)

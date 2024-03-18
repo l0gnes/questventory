@@ -19,13 +19,13 @@ class SearchStrategyInterface(ABC):
     # just returns the "working query set" of Game elements we'll be sifting through 
     def get_context(self) -> QuerySet:
         if self.ctx is None:
-            return Game.objects
+            return self.ctx
         return self.ctx
 
     @abstractmethod
     def search(self,s:Any) -> List[Game]: raise NotImplemented # s is the search item
 
-class SearchViaName(SearchStrategyInterface):
+class SearchViaTitle(SearchStrategyInterface):
 
     ctx : QuerySet
 
@@ -33,7 +33,7 @@ class SearchViaName(SearchStrategyInterface):
         self.ctx = ctx
 
     def search(self,s:str) -> List[Game]:
-        return Game.objects.filter(name__icontains=s).all()
+        return self.ctx.filter(title__icontains=s).all()
     
 class SearchViaGenre(SearchStrategyInterface):
 
@@ -43,7 +43,7 @@ class SearchViaGenre(SearchStrategyInterface):
         self.ctx = ctx
 
     def search(self, s: str) -> List[Game]:
-        return Game.objects.filter(genre__name__icontains=s).all()
+        return self.ctx.filter(genres__name__icontains=s).all()
 
 class SearchViaConsole(SearchStrategyInterface):
 
@@ -53,7 +53,7 @@ class SearchViaConsole(SearchStrategyInterface):
         self.ctx = ctx
 
     def search(self, s: str) -> List[Game]:
-        return Game.objects.filter(console__name__icontains=s).all()
+        return self.ctx.filter(consoles__name__icontains=s).all()
     
 class SearchViaDeveloper(SearchStrategyInterface):
 
@@ -63,7 +63,7 @@ class SearchViaDeveloper(SearchStrategyInterface):
         self.ctx = ctx
 
     def search(self, s: str) -> List[Game]:
-        return Game.objects.filter(developer__name__icontains=s).all()
+        return self.ctx.filter(developer__name__icontains=s).all()
         
 def get_strategy(
     ctx : QuerySet,
@@ -75,7 +75,7 @@ def get_strategy(
         code.
     """
     if type == 'title':
-        return SearchViaName(ctx)
+        return SearchViaTitle(ctx)
     elif type == 'console':
         return SearchViaConsole(ctx)
     elif type == 'developer':

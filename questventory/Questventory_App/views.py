@@ -65,7 +65,24 @@ def allInventory(request):
     wholeInventory = Game.objects.annotate(
         total_stock=Sum("gameconsolestock__stock")
     ).order_by("-id")[0::]
-    return render(request, 'inventory.html', {'wholeInventory': wholeInventory, 'search_form' : InventorySearchForm()})
+
+    form = InventorySearchForm(request.GET)
+
+    # This should cancel the request from going any further if it's invalid
+    if form.is_valid() and len(form.cleaned_data['search_term']) > 0:
+    
+        search_strategy = InventorySearchForm.get_strategy(
+            ctx = wholeInventory,
+            strat_str = form.cleaned_data['search_type']
+        )
+
+        filtered_results = search_strategy.search(
+            s = form.cleaned_data['search_term']
+        )
+
+        return render(request, 'inventory.html', {'wholeInventory': filtered_results, 'search_form' : form})
+    else:
+        return render(request, 'inventory.html', {'wholeInventory': wholeInventory, 'search_form' : form})
 
 def gameDetail(request, pk):
     game = get_object_or_404(Game, pk=pk)
