@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import Decimal
 
 class Console(models.Model):
     CONSOLE_CHOICES = [
@@ -23,6 +24,24 @@ class Genre(models.Model):
         ('adventure', 'Adventure'),
         ('horror', 'Horror'),
         ('rpg', 'RPG'),
+        ('strategy', 'Strategy'),
+        ('simulation', 'Simulation'),
+        ('puzzle', 'Puzzle'),
+        ('sports', 'Sports'),
+        ('racing', 'Racing'),
+        ('fighting', 'Fighting'),
+        ('platformer', 'Platformer'),
+        ('shooter', 'Shooter'),
+        ('mmo', 'MMO'),
+        ('music', 'Music/Rhythm'),
+        ('indie', 'Indie'),
+        ('arcade', 'Arcade'),
+        ('visual_novel', 'Visual Novel'),
+        ('card_game', 'Card Game'),
+        ('educational', 'Educational'),
+        ('sandbox', 'Sandbox'),
+        ('battle_royale', 'Battle Royale'),
+        ('stealth', 'Stealth'),
     ]
     name = models.CharField(max_length=50, choices=GENRE_CHOICES, unique=True)
 
@@ -35,6 +54,7 @@ class Game(models.Model):
     developer = models.ForeignKey(Developer, on_delete=models.CASCADE)
     consoles = models.ManyToManyField(Console, through='GameConsoleStock')
     genres = models.ManyToManyField(Genre)
+    price = models.DecimalField(max_digits=8, default=Decimal("59.99"), decimal_places=2)
 
     def __str__(self):
         return self.title

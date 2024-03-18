@@ -29,6 +29,7 @@ def home(request):
             developer_name = form.cleaned_data['developer']
             genre_ids = [genre.id for genre in form.cleaned_data['genres']]
             console_ids = [console.id for console in form.cleaned_data['consoles']]
+            price = form.cleaned_data['price']
             stock = form.cleaned_data['stock']
             
             # Use the factory to create the game and its relationships

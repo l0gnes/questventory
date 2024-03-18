@@ -11,7 +11,7 @@ class ComprehensiveGameForm(forms.ModelForm):
 
     class Meta:
         model = Game
-        fields = ['title', 'release_date', 'developer', 'consoles', 'genres']
+        fields = ['title', 'release_date', 'developer', 'consoles', 'genres', 'price']
         widgets = {
             'release_date': forms.DateInput(attrs={'type': 'date'}),
             'consoles': forms.CheckboxSelectMultiple,
