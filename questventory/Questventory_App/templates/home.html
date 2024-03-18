@@ -1,102 +1,104 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="container-fluid">
-        <div class="col">
-            <!-- Panel for recently added games -->
-            <div class="col-md-2">
-                <div class="d-flex">
-                    <button class="btn btn-primary">Inventory</button>
-                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addGameModal">Add New Game</button>
-                </div>
-                <div class="list-group" style="height: 500px; width: 1000px; overflow-y: scroll;">
-                  <table class="table">
-                      <thead class="thead-dark">
-                          <tr>
-                              <th scope="col">#</th>
-                              <th scope="col">Name</th>
-                              <th scope="col">Console(s)</th>
-                              <th scope="col">Genre(s)</th>
-                              <th scope="col">Developer</th>
-                              <th scope="col">Total Stock</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {% for game in recent_games %}
-                              <tr>
-                                  <th scope="row">{{ forloop.counter }}</th>
-                                  <td>{{ game.title }}</td>
-                                  <td>{% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-                                  <td>{% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-                                  <td>{{ game.developer.name }}</td>
-                                  <td>{{ game.total_stock }}</td>
-                              </tr>
-                          {% empty %}
-                              <tr>
-                                  <td colspan="6">No recent game additions found.</td>
-                              </tr>
-                          {% endfor %}
-                      </tbody>
-                  </table>
-              </div>
-                <h2>Low Stock Items</h2>
+
+<div class="container-fluid">
+
+    <div class="row p-3 gap-3">
+        <div class="d-flex flex-column col card py-3">
+            <div class="flex flex-row justify-content-between">
+                <h2 class="d-inline-flex">Quick View</h2>
+                <button class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#addGameModal">Add New Game</button>
+            </div>
+
+            <table class="table" style="max-height: 80vh;">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Console(s)</th>
+                        <th scope="col">Genre(s)</th>
+                        <th scope="col">Developer</th>
+                        <th scope="col">Total Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in recent_games %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ game.title }}</td>
+                        <td>{% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor%}</td>
+                        <td>{% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        </td>
+                        <td>{{ game.developer.name }}</td>
+                        <td>{{ game.total_stock }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No recent game additions found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex flex-column col card py-3">
+            <h2>Low Stock Items</h2>
+            <div class="overflow-y-scroll border border-1 p-2 rounded" style="max-height: 80vh;">
                 {% for notification in low_stock_notifications %}
-                    <div>
-                    <p>{{ notification.game_title }} on {{ notification.console_name }} is low on stock: {{ notification.stock_amount }} left.</p>
+                    <div class="alert alert-warning d-flex flex-column" role="alert">
+                        <span style="font-size: medium;"><strong>{{ notification.game_title }}</strong> on {{ notification.console_name }} is low on stock!</span>
+                        <span style="font-size: small;">{{ notification.stock_amount }} left!</span>
                     </div>
                 {% endfor %}
+            </div>
         </div>
     </div>
 
-
+</div>
 
 <!--The modal code to add new games to the database, which will open on the home page.-->
 <div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-      <div class="modal-content">
-          <form method="post" action="{% url 'home' %}">
-              {% csrf_token %}
-              <div class="modal-header">
-                  <h5 class="modal-title" id="addGameModalLabel">Add New Game</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <!-- Manually rendering the form fields, allows for custom layouts or labels. -->
-                  <div class="mb-3">
-                      {{ form.title.label_tag }}
-                      {{ form.title }}
-                  </div>
-                  <div class="mb-3">
-                      {{ form.release_date.label_tag }}
-                      {{ form.release_date }}
-                  </div>
-                  <div class="mb-3">
-                      {{ form.developer.label_tag }}
-                      {{ form.developer }}
-                  </div>
-                  <div class="mb-3">
-                      {{ form.genres.label_tag }}
-                      {{ form.genres }}
-                  </div>
-                  <div class="mb-3">
-                      {{ form.consoles.label_tag }} 
-                      {{ form.consoles }}
-                  </div>
-                  <div class="mb-3">
-                      {{ form.stock.label_tag }}
-                      {{ form.stock }}
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Save changes</button>
-              </div>
-          </form>
-      </div>
-  </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'home' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addGameModalLabel">Add New Game</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Manually rendering the form fields, allows for custom layouts or labels. -->
+                    <div class="mb-3">
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.release_date.label_tag }}
+                        {{ form.release_date }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.developer.label_tag }}
+                        {{ form.developer }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.genres.label_tag }}
+                        {{ form.genres }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.consoles.label_tag }}
+                        {{ form.consoles }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.stock.label_tag }}
+                        {{ form.stock }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
-
 {% endblock %}
-

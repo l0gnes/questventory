@@ -43,19 +43,14 @@ def home(request):
                 
             )
             
-            for console_id in [console.id for console in form.cleaned_data['consoles']]:
-                stock_instance = GameConsoleStock.objects.get(game=game, console_id=console_id)
-                global_stock_observer.item_sell_callback(stock_instance)    
+            #for console_id in [console.id for console in form.cleaned_data['consoles']]:
+            #    stock_instance = GameConsoleStock.objects.get(game=game, console_id=console_id)
+            #    global_stock_observer.item_sell_callback(stock_instance)    
             
             return redirect('home.html')
     else:
         form = ComprehensiveGameForm()
     
-  
-  
-  
-  
-  
     notifications = global_stock_observer.get_low_stock_notifications()
     print(notifications) 
     recent_games = Game.objects.annotate(total_stock=Sum('gameconsolestock__stock')).order_by('-id')[:10]
