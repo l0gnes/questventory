@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from decimal import Decimal
 
-# Creating the builder that will be used to build the receipt based on cart contents.
+# Instantiating Abstract Base Classes for the receipt builder.
 class ReceiptBuilder(ABC):
     
     @abstractmethod
@@ -20,12 +21,12 @@ class Receipt:
     
     def __init__(self):
         self.items = []
-        self.total_cost = 0
+        self.total_cost = Decimal('0.00')
         self.footer = ""
     
     def add_item(self, item):
         self.items.append(item)
-        self.total_cost += item['cost']
+        self.total_cost += Decimal(item['subtotal'])
     
     def set_footer(self, footer):
         self.footer = footer

@@ -6,7 +6,7 @@ from .searchStrategy import (
 )
 
 class ComprehensiveGameForm(forms.ModelForm):
-    # Additional field for stock on a specific console
+    # Setting the initial stock for all consoles selected.
     stock = forms.IntegerField(min_value=0, required=True, label="Initial Stock")
 
     class Meta:
@@ -24,6 +24,7 @@ class ComprehensiveGameForm(forms.ModelForm):
         self.fields['developer'].queryset = Developer.objects.all()
         self.fields['consoles'].queryset = Console.objects.all()
         self.fields['genres'].queryset = Genre.objects.all()
+        self.fields['price'].widget = forms.NumberInput(attrs={'step': '0.01'})
 
     def save(self, commit=True):
         game = super().save(commit=False)

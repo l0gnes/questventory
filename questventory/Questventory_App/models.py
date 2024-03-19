@@ -62,11 +62,12 @@ class Game(models.Model):
 class GameConsoleStock(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     console = models.ForeignKey(Console, on_delete=models.CASCADE)
-    stock = models.IntegerField(default=0)  # Stock amount, starts at zero.
+    stock = models.IntegerField(default=0)
     is_low_stock = models.BooleanField(default=False)
 
+    # Makes sure that each game-console pair is unique.
     class Meta:
-        unique_together = ('game', 'console')  # Ensures each game-console pair is unique
+        unique_together = ('game', 'console')  
     
     # This overwrites the default saving method. It enforces whenever this model is saved
     # to trigger the is_low_stock boolean.    

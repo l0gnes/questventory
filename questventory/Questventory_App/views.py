@@ -4,9 +4,11 @@ from .models import Game, Console, GameConsoleStock
 from .abstractGameFactory import GameInventoryFactory
 from .observerKeepTrackOfStock import global_stock_observer
 from django.db.models import Sum
+from django.db import transaction
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from decimal import Decimal
+from .builderPattern import ReceiptDirector, DetailedReceiptBuilder
 
 def home(request):
     
@@ -43,6 +45,7 @@ def home(request):
                 developer_name=developer_name,
                 genre_ids=genre_ids,
                 console_ids=console_ids,
+                price = price,
                 stock=stock,
                 
             )
@@ -105,7 +108,7 @@ def addToCart(request, stock_id):
     # Creates a unique pair for the game-console combination in the cart.
     cart_pair = f"{game_id}_{console_id}"
     
-    # Fetch the game to get the price associated with it.
+    # Since the price is recorded in the Game model, we need to access it to get the price.
     game = get_object_or_404(Game, pk=game_id)
     
     # Since Django uses JSON for sessions, the price needs to be converted to a string
@@ -121,7 +124,8 @@ def addToCart(request, stock_id):
             'game_id': game_id, 
             'console_id': console_id, 
             'quantity': 1,
-            'price': price_string
+            'price': price_string,
+            'stock_id': stock_id
             }
     
     # Saves the cart in the session cookie.
@@ -151,3 +155,60 @@ def displayCart(request):
         })
     
     return render(request, 'checkout.html', {'cart': detailed_cart, 'total_cost': total_cost})
+
+# Atomic transaction ensures that all steps of the checkout process are correct.
+# If a part of the transaction fails, no transaction happens at all.
+@transaction.atomic
+def purchase(request):
+    cart = request.session.get('cart', {})
+    if not cart:
+        messages.error(request, "Your cart is empty.")
+        return redirect('checkout.html')
+
+    # Initialize receipt builder for use in checkout.
+    director = ReceiptDirector(DetailedReceiptBuilder())
+    
+    items = []
+    try:
+        for key, item in cart.items():
+            stock_id = item.get('stock_id')
+            quantity = item.get('quantity')
+            
+            # This code checks to make sure that there's a sufficient amount of stock
+            # for the items being purchased. If there's not enough, the purchase will
+            # throw an error and not go through.
+            print(f"Looking up GameConsoleStock with ID: {stock_id}")  # Debug output
+            stock = GameConsoleStock.objects.select_for_update().get(pk=stock_id)
+            if stock.stock < quantity:
+                raise ValueError(f"Not enough stock for {stock.game.title} on {stock.console.name}.")
+            
+            stock.stock -= quantity
+            stock.save()
+        
+            # Setting up the dict for the items that'll be placed on the receipt
+            # by the builder director.
+            dict_items = {
+                'title': stock.game.title,
+                'console': stock.console.name,
+                'quantity': quantity,
+                'price': item['price'],
+                'subtotal': str(Decimal(item['price']) * quantity)
+            }
+            items.append(dict_items)
+        
+        # Using the director defined in the builder pattern to construct the
+        # receipt to be displayed.
+        director.construct_receipt(items, "Thank you for your purchase!")
+
+        # Clears the session cookie, and the cart goes with it.
+        del request.session['cart']
+        
+    except ValueError as e:
+        # Rollback in case of error to make sure the database values don't
+        # get messed up.
+        transaction.set_rollback(True)
+        messages.error(request, str(e))
+        return redirect('checkout.html')
+    
+    receipt = director.get_receipt()
+    return render(request, 'receipt.html', {'receipt': receipt})
