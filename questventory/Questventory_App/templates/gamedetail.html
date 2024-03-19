@@ -8,11 +8,11 @@
 
             <div class="card my-2 p-2">
                 <h4>Manage Game Entry</h4>
-                <div class="d-flex flex-row gap-3">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editGameModal">Edit Entry</button>
-                    <form action="{% url 'deleteInventoryEntry' game.pk %}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure?');">
+                <div class="d-flex flex-row gap-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editGameModal"><i class="bi bi-pencil-square me-2"></i> Edit Entry</button>
+                    <form action="{% url 'deleteInventoryEntry' game.pk %}" method="post" onsubmit="return confirm('Are you sure?');" class="mb-0">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill me-2"></i> Delete</button>
                     </form>
                 </div>
             </div>
@@ -77,12 +77,12 @@
                                 <input type="hidden" name="game_id" value="{{ game.id }}">
                                 <input type="hidden" name="console_id" value="{{ stock.console.id }}">
                                 <input type="hidden" name="stock_id" value="{{ stock.id }}">
-                                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                                <button type="submit" class="btn btn-primary"><i class="bi bi-cart-plus me-2"></i> Add to Cart</button>
                             </form>
                         </td>
                         {% else %} <!-- If there is no stock, don't create a form at all -->
                         <td class="text-end">
-                            <button class="btn btn-secondary" disabled>Out of Stock!</button>
+                            <button class="btn btn-secondary" disabled><i class="bi bi-cart-x me-2"></i> Out of Stock!</button>
                         </td>
                         {% endif %}
                     </tr>

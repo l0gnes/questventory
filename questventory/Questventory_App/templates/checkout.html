@@ -2,58 +2,71 @@
 {% block content %}
 <div class="container my-4">
     <div class="row">
-        <!-- Placeholder image section -->
-        <div class="col-md-4">
-            <div class="bg-secondary ratio ratio-1x1 d-flex align-items-center justify-content-center text-white">(Insert Image Here)</div>
-
-            <div class="card my-2 p-2">
-                <div class="d-flex flex-row gap-3">
-                    <form action="{% url 'purchase' %}" method="post" class="mb-0">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">Purchase</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        
         <!-- Game details section -->
         <div class="d-flex flex-column col card py-3">
             <div class="flex flex-row justify-content-between">
                 <h2 class="d-inline-flex">Current Cart</h2>
             </div>
 
-            <table class="table" style="max-height: 80vh;">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Game</th>
-                        <th scope="col">Console</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in cart %}
-                    <tr>
-                        {% comment %} <th scope="row">{{ forloop.counter }}</th> {% endcomment %}
-                        <td>{{ item.game_title }}</td>
-                        <td>{{ item.console }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>${{ item.price }}</td>
-                        <td>${{ item.item_total }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6">Your cart is empty.</td>
-                    </tr>
-                    {% endfor %}
-                    <tr>
-                        <td style="padding-right: 3.5rem;" align="right" colspan="5"><strong>Total: ${{ total_cost }}</strong></td>
-                    </tr>
-                </tbody>
-            </table>
+            {% if cart|length > 0 %}
+                <table class="table" style="max-height: 80vh;">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Game</th>
+                            <th scope="col">Console</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Unit Price</th>
+                            <th scope="col">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart %}
+                        <tr>
+                            {% comment %} <th scope="row">{{ forloop.counter }}</th> {% endcomment %}
+                            <td>{{ item.game_title }}</td>
+                            <td>{{ item.console }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>${{ item.price }}</td>
+                            <td>${{ item.item_total }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+
+            <div class="d-flex flex-column justify-content-center align-items-center flex-grow-1">
+                <h1>
+                    <i class="bi bi-emoji-frown"></i>
+                </h1>
+                <h5>Your cart is empty!</h5>
+                <a href="{% url 'inventory' %}">Check out our inventory here</a>
+            </div>
+
+            {% endif %}
         </div>       
+        
+        <div class="col-md-4">
+            <div class="card p-3">
+
+                <h3>Complete Purchase</h3>
+
+                <p>
+                    Thank you for shopping at QuestVentory! We hope you found everything alright!
+                </p>
+
+                <hr class="mb-3 mt-1" />
+
+                <form action="{% url 'purchase' %}" method="post" class="mb-0 text-end flex-column d-flex flex-grow">
+                    <div class="d-flex flex-row justify-content-between flex-grow-1">
+                        <strong>Total:</strong>
+                        <span>${{ total_cost }}</span>
+                    </div>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary align-self-end mt-2" {% if cart|length == 0%} disabled {% endif %}><i class="bi bi-bag me-2"></i>Purchase</button>
+                </form>
+            </div>
         </div>
+
     </div>
 </div>
 {% endblock %}

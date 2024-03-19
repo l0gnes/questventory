@@ -68,7 +68,7 @@ class InventorySearchForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Search", 
-                "class" : 'flex-grow-1 px-2'
+                "class" : 'flex-grow-1 px-2 form-control'
             }
         )
     )
@@ -80,6 +80,10 @@ class InventorySearchForm(forms.Form):
             "console" : "Console",
             "genre" : "Genre",
             "developer" : "Developer",
+        },
+        attrs={
+            "class" : 'form-select mw-25',
+            'style' : 'flex-basis: 16rem;'
         }
     ))
 
