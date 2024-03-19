@@ -4,38 +4,119 @@
     <div class="row">
         <!-- Placeholder image section -->
         <div class="col-md-4">
+            <div class="bg-secondary ratio ratio-1x1 d-flex align-items-center justify-content-center text-white">(Insert Image Here)</div>
+
+            <div class="card my-2 p-2">
+                <h4>Manage Game Entry</h4>
+                <div class="d-flex flex-row gap-3">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editGameModal">Edit Entry</button>
+                    <form action="{% url 'deleteInventoryEntry' game.pk %}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
         </div>
         
         <!-- Game details section -->
         <div class="col-md-8">
             <h1 class="mb-3">{{ game.title }}</h1>
-            <p class="mb-2"><strong>Release Date:</strong> {{ game.release_date|date:"Y-m-d" }}</p>
-            <p class="mb-2"><strong>Developer:</strong> {{ game.developer.name }}</p>
-            <p class="mb-2"><strong>Genres:</strong> {% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-            <p class="mb-2"><strong>Available Consoles:</strong>{% comment %}  {% for console in game.consoles.all %}{{ console.name }}{% if not forloop.last %}, {% endif %}{% endfor %} {% endcomment %}</p>
-            <ul>
-                {% for stock in console_stocks %}
-                <li>
-                    {{ stock.console.name }}: {{ stock.stock }} available
-                    <form action="{% url 'addToCart' stock.id %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="game_id" value="{{ game.id }}">
-                        <input type="hidden" name="console_id" value="{{ stock.console.id }}">
-                        <input type="hidden" name="stock_id" value="{{ stock.id }}">
-                        <button type="submit">Add to Cart</button>
-                    </form>
-                </li>
-                {% endfor %}
-            </ul>
-            <p class="mb-2"><strong>Price: $</stong>{{ game.price }}</p>
-            <div class="d-flex">
-                <button class="btn btn-primary me-2">Edit Entry</button>
-                <form action="{% url 'deleteInventoryEntry' game.pk %}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure?');">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
+
+            <table class="table table-striped border">
+                <h4>Entry Information</h4>
+                <thead></thead>
+                <tbody>
+                    <tr>
+                        <th>Price:</th>
+                        <td>${{ game.price }}</td>
+                    </tr>
+                    <tr>
+                        <th>Genres</th>
+                        <td>{% for genre in game.genres.all %}{{ genre.name|title }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                    </tr>
+                    <tr>
+                        <th>Developer:</th>
+                        <td>{{ game.developer.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Release Date:</th>
+                        <td>{{ game.release_date|date:"F j, Y" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Game stock section -->
+            <table class="table border">
+                <h4>Available Consoles</h4>
+                <thead>
+                    <tr>
+                        <th>Console</th>
+                        <th>Available Stock</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in console_stocks|dictsortreversed:"stock" %}
+
+                    <!-- A very simple way to determine what kind of table row colour to use depending on game stock-->
+                    {% if stock.stock == 0%}
+                    <tr class="table-secondary">
+                    {% elif stock.is_low_stock %}
+                    <tr class="table-warning">
+                    {% else %}
+                    <tr class="table-success">
+                    {% endif %}
+
+
+                        <td>{{ stock.console.name }}</td>
+                        <td>{{ stock.stock }}</td>
+                        {% if stock.stock > 0 %}
+                        <td class="text-end">
+                            <form action="{% url 'addToCart' stock.id %}" method="post" class="mb-0">
+                                {% csrf_token %}
+                                <input type="hidden" name="game_id" value="{{ game.id }}">
+                                <input type="hidden" name="console_id" value="{{ stock.console.id }}">
+                                <input type="hidden" name="stock_id" value="{{ stock.id }}">
+                                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                            </form>
+                        </td>
+                        {% else %} <!-- If there is no stock, don't create a form at all -->
+                        <td class="text-end">
+                            <button class="btn btn-secondary" disabled>Out of Stock!</button>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>       
         </div>
     </div>
 </div>
+
+<!-- Modal to edit current open game details -->
+<div class="modal fade" id="editGameModal" tabindex="-1" aria-labelledby="editGameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" action="{% url 'editGame' game.id %}">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="editGameModalLabel">Edit Game</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {{ form.as_p }}
+            {{ stock_formset.management_form }}
+            {% for form in stock_formset %}
+                {{ form.as_p }}
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from .forms import ComprehensiveGameForm, InventorySearchForm
+from .forms import ComprehensiveGameForm, InventorySearchForm, EditGameForm
 from .models import Game, Console, GameConsoleStock
 from .abstractGameFactory import GameInventoryFactory
 from .observerKeepTrackOfStock import global_stock_observer
@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from decimal import Decimal
 from .builderPattern import ReceiptDirector, DetailedReceiptBuilder
+from django.forms import inlineformset_factory
 
 def home(request):
     
@@ -46,15 +47,9 @@ def home(request):
                 genre_ids=genre_ids,
                 console_ids=console_ids,
                 price = price,
-                stock=stock,
-                
-            )
-            
-            #for console_id in [console.id for console in form.cleaned_data['consoles']]:
-            #    stock_instance = GameConsoleStock.objects.get(game=game, console_id=console_id)
-            #    global_stock_observer.item_sell_callback(stock_instance)    
-            
-            return redirect('home.html')
+                stock=stock,      
+            )    
+        return redirect('home.html')
     else:
         form = ComprehensiveGameForm()
     
@@ -63,6 +58,10 @@ def home(request):
     recent_games = Game.objects.annotate(total_stock=Sum('gameconsolestock__stock')).order_by('-id')[:10]
     return render(request, 'home.html', {'form': form, 'recent_games': recent_games, 'low_stock_notifications': notifications})
 
+
+# This view renders both the inventory list on the inventory page, and also contains
+# the relevant functions to integrate the Iterator/Strategy design patterns for
+# the searching function.
 def allInventory(request):
     wholeInventory = Game.objects.annotate(
         total_stock=Sum("gameconsolestock__stock")
@@ -86,11 +85,36 @@ def allInventory(request):
     else:
         return render(request, 'inventory.html', {'wholeInventory': wholeInventory, 'search_form' : form})
 
+
+# This is the view that renders all the details for each individual game detail page
+# accessed from the inventory page.
+# This view also renders the editing function for game entries on the game detail page.
+# Unfortunately, this form can't be used to modify the consoles the game is available
+# on because the form won't update in real time to add more stock fields.
 def gameDetail(request, pk):
     game = get_object_or_404(Game, pk=pk)
+    
+    # The inlineformset_factory is a Django form function that creates a section of
+    # fields on the form that can be used to edit individual game stocks for different consoles.
+    StockFormSet = inlineformset_factory(Game, GameConsoleStock, fields=('stock',), extra=0, can_delete=False)
+    
+    if request.method == 'POST':
+        form = EditGameForm(request.POST, instance=game)
+        stock_formset = StockFormSet(request.POST, instance=game)
+        
+        if form.is_valid() and stock_formset.is_valid():
+            form.save()
+            stock_formset.save()
+            messages.success(request, 'Game details updated successfully.')
+            return redirect('gameDetail', pk=game.id)
+    else:
+        form = EditGameForm(instance=game)
+        stock_formset = StockFormSet(instance=game)
+    
     console_stocks = game.gameconsolestock_set.all()
-    return render(request, 'gamedetail.html', {'game': game, 'console_stocks': console_stocks})
+    return render(request, 'gamedetail.html', {'game': game, 'console_stocks': console_stocks, 'form': form, 'stock_formset': stock_formset})
 
+# Does what it says on the box.
 def deleteInventoryEntry(request, pk):
     game = get_object_or_404(Game, pk=pk)
     game.delete()
@@ -135,6 +159,9 @@ def addToCart(request, stock_id):
     
     return redirect('gameDetail', pk=game_id)
 
+# This view is used to render the cart contents on the checkout page with more detail.
+# The usage of Decimal is to ensure that the price stored in the session cookie
+# is correctly converted from string.
 def displayCart(request):
     cart = request.session.get('cart', {})
     detailed_cart = []
