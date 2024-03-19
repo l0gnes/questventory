@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Receipt</h2>
+<ul>
+    {% for item in receipt.items %}
+        <li>{{ item.quantity }}x {{ item.title }} for {{ item.console }} - ${{ item.subtotal }}</li>
+    {% endfor %}
+</ul>
+<p>Total Cost: ${{ receipt.total_cost }}</p>
+<p>{{ receipt.footer }}</p>
+
+{% endblock %}

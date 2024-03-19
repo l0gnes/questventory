@@ -8,18 +8,14 @@
 
             <div class="card my-2 p-2">
                 <h4>Manage Game Entry</h4>
-
                 <div class="d-flex flex-row gap-3">
-                    <button class="btn btn-primary">Edit Entry</button>
-                    <form action="{% url 'deleteInventoryEntry' game.pk %}" method="post" onsubmit="return confirm('Are you sure?');"
-                        class="mb-0">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editGameModal">Edit Entry</button>
+                    <form action="{% url 'deleteInventoryEntry' game.pk %}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure?');">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>
-
             </div>
-
         </div>
         
         <!-- Game details section -->
@@ -96,4 +92,31 @@
         </div>
     </div>
 </div>
+
+<!-- Modal to edit current open game details -->
+<div class="modal fade" id="editGameModal" tabindex="-1" aria-labelledby="editGameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" action="{% url 'editGame' game.id %}">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="editGameModalLabel">Edit Game</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {{ form.as_p }}
+            {{ stock_formset.management_form }}
+            {% for form in stock_formset %}
+                {{ form.as_p }}
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}

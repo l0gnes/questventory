@@ -20,6 +20,11 @@ from django.views.generic import RedirectView
 
 from Questventory_App import views
 
+
+# Django uses URL path configurations to determine which views should be rendered
+# and also defines the URL that you see. Some of the URLs, like the gamedetail and
+# addToCart use the primary key (pk) for functions.
+
 urlpatterns = [
     path('', RedirectView.as_view(url='/home.html')),
     path('admin/', admin.site.urls),
@@ -27,8 +32,10 @@ urlpatterns = [
     path('inventory.html', views.allInventory, name='inventory'),
     path('inventory.html', views.allInventory, name='search_inventory'),
     path('gamedetail/<int:pk>', views.gameDetail, name='gameDetail' ),
+    path('gamedetail/<int:pk>', views.gameDetail, name='editGame' ),
     path('gamedetail/delete/<int:pk>/', views.deleteInventoryEntry, name='deleteInventoryEntry'),
-    path('add_to_cart/<int:stock_id>/', views.addToCart, name='addToCart'),
+    path('addToCart/<int:stock_id>/', views.addToCart, name='addToCart'),
     path('checkout.html', views.displayCart, name='checkout'),
+    path('receipt.html', views.purchase, name='purchase')
 ]
 
