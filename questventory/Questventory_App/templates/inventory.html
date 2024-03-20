@@ -10,8 +10,8 @@
             <form action="{% url 'inventory' %}" method="GET" class="d-flex flex-row gap-2">
                 {% csrf_token %}
                 {{ search_form.search_term }}
-                {{ search_form.search_type }}
-                <input type="submit" value="Search">
+            {{ search_form.search_type }}
+                <input type="submit" value="Search" class="btn btn-primary">
             </form>
         </div>
 

@@ -6,12 +6,12 @@ from .searchStrategy import (
 )
 
 class ComprehensiveGameForm(forms.ModelForm):
-    # Additional field for stock on a specific console
+    # Setting the initial stock for all consoles selected.
     stock = forms.IntegerField(min_value=0, required=True, label="Initial Stock")
 
     class Meta:
         model = Game
-        fields = ['title', 'release_date', 'developer', 'consoles', 'genres']
+        fields = ['title', 'release_date', 'developer', 'consoles', 'genres', 'price']
         widgets = {
             'release_date': forms.DateInput(attrs={'type': 'date'}),
             'consoles': forms.CheckboxSelectMultiple,
@@ -24,6 +24,7 @@ class ComprehensiveGameForm(forms.ModelForm):
         self.fields['developer'].queryset = Developer.objects.all()
         self.fields['consoles'].queryset = Console.objects.all()
         self.fields['genres'].queryset = Genre.objects.all()
+        self.fields['price'].widget = forms.NumberInput(attrs={'step': '0.01'})
 
     def save(self, commit=True):
         game = super().save(commit=False)
@@ -42,6 +43,21 @@ class ComprehensiveGameForm(forms.ModelForm):
                 )
 
         return game
+    
+class EditGameForm(forms.ModelForm):
+    class Meta:
+        model = Game
+        fields = ['title', 'release_date', 'developer', 'genres', 'price']
+        widgets = {
+            'release_date': forms.DateInput(attrs={'type': 'date'}),
+            'genres': forms.CheckboxSelectMultiple,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['developer'].queryset = Developer.objects.all()
+        self.fields['genres'].queryset = Genre.objects.all()
+        self.fields['price'].widget = forms.NumberInput(attrs={'step': '0.01'})
 
 class InventorySearchForm(forms.Form):
     # Used on the inventory when searching
@@ -52,7 +68,7 @@ class InventorySearchForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Search", 
-                "class" : 'flex-grow-1 px-2'
+                "class" : 'flex-grow-1 px-2 form-control'
             }
         )
     )
@@ -64,6 +80,10 @@ class InventorySearchForm(forms.Form):
             "console" : "Console",
             "genre" : "Genre",
             "developer" : "Developer",
+        },
+        attrs={
+            "class" : 'form-select mw-25',
+            'style' : 'flex-basis: 16rem;'
         }
     ))
 

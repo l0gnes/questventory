@@ -7,7 +7,7 @@
         <div class="d-flex flex-column col card py-3">
             <div class="flex flex-row justify-content-between">
                 <h2 class="d-inline-flex">Quick View</h2>
-                <button class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#addGameModal">Add New Game</button>
+                <button class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#addGameModal"><i class="bi bi-plus-circle-fill me-2"></i>Add New Game</button>
             </div>
 
             <table class="table" style="max-height: 80vh;">
@@ -18,6 +18,7 @@
                         <th scope="col">Console(s)</th>
                         <th scope="col">Genre(s)</th>
                         <th scope="col">Developer</th>
+                        <th scope="col">Price</th>
                         <th scope="col">Total Stock</th>
                     </tr>
                 </thead>
@@ -30,6 +31,7 @@
                         <td>{% for genre in game.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
                         </td>
                         <td>{{ game.developer.name }}</td>
+                        <td>{{ game.price }}</td>
                         <td>{{ game.total_stock }}</td>
                     </tr>
                     {% empty %}
@@ -87,6 +89,10 @@
                     <div class="mb-3">
                         {{ form.consoles.label_tag }}
                         {{ form.consoles }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.price.label_tag }}
+                        {{ form.price }}
                     </div>
                     <div class="mb-3">
                         {{ form.stock.label_tag }}
