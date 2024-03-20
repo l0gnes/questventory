@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from .forms import ComprehensiveGameForm, InventorySearchForm, EditGameForm
 from .models import Game, Console, GameConsoleStock
-from .abstractGameFactory import GameInventoryFactory
+from .gameFactory import GameInventoryFactory
 from .observerKeepTrackOfStock import StockObserver
 from django.db.models import Sum
 from django.db import transaction
