@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from .forms import ComprehensiveGameForm, InventorySearchForm, EditGameForm
 from .models import Game, Console, GameConsoleStock
 from .abstractGameFactory import GameInventoryFactory
-from .observerKeepTrackOfStock import global_stock_observer
+from .observerKeepTrackOfStock import StockObserver
 from django.db.models import Sum
 from django.db import transaction
 from django.views.decorators.http import require_POST
@@ -21,7 +21,7 @@ def home(request):
     
         # Trigger the low stock check for each stock record
         for stock_instance in game_stock_records:
-            global_stock_observer.item_sell_callback(stock_instance)
+            StockObserver.get_instance().item_sell_callback(stock_instance)
     
     
     # Displays the last 10 added games to the panel on the home page.
@@ -53,7 +53,7 @@ def home(request):
     else:
         form = ComprehensiveGameForm()
     
-    notifications = global_stock_observer.get_low_stock_notifications()
+    notifications = StockObserver.get_instance().get_low_stock_notifications()
     print(notifications) 
     recent_games = Game.objects.annotate(total_stock=Sum('gameconsolestock__stock')).order_by('-id')[:10]
     return render(request, 'home.html', {'form': form, 'recent_games': recent_games, 'low_stock_notifications': notifications})

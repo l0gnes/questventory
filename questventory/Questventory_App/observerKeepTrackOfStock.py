@@ -28,6 +28,8 @@ class LowStockNotification:
 
 class StockObserver:
 
+    instance : "StockObserver" # The singleton instance
+
     def __init__(self) -> None:
         self.subscribers: List["SubscriberInterface"] = []
         self.low_stock_notifications: List[LowStockNotification] = []
@@ -61,10 +63,12 @@ class StockObserver:
     # Getting low stock notifications to display where needed.
     def get_low_stock_notifications(self) -> List[LowStockNotification]:
         return self.low_stock_notifications
-    
-# Initialization of the global stock observer for use elsewhere.
-global_stock_observer = StockObserver()
 
+    @classmethod
+    def get_instance(cls):
+        if not hasattr(cls, "instance"):
+            cls.instance = StockObserver()
+        return cls.instance
 
 class SubscriberInterface(ABC):
 
